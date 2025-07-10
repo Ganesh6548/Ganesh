@@ -1,1 +1,1 @@
-# Ganesh
+# Course detail viewer
