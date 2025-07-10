@@ -1,1 +1,2 @@
-# Course detail viewer
+# course_detail_viewer.py
+
