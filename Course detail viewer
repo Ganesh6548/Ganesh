@@ -1,0 +1,52 @@
+import streamlit as st
+import pandas as pd
+
+st.title("📘 Search Specific Course Details")
+
+uploaded_file = st.file_uploader("Upload Excel file (no headers)", type=["xlsx", "xls"])
+
+if uploaded_file is not None:
+    try:
+        # Read without header
+        df = pd.read_excel(uploaded_file, header=None)
+
+        # Display preview
+        with st.expander("📊 Preview Raw Data"):
+            st.dataframe(df.head(10))
+
+        # Input box for search
+        st.subheader("🔍 Search for a Course by Name or ID")
+        search_term = st.text_input("Enter course name or course ID")
+
+        if search_term:
+            # Search rows containing the term
+            results = df[df.apply(lambda row: row.astype(str).str.contains(search_term, case=False, na=False).any(), axis=1)]
+
+            if not results.empty:
+                row = results.iloc[0]  # show the first match
+
+                # Now label the fields manually (adjust indexes based on your actual file)
+                st.markdown("### 📝 Course Details")
+
+                # You MUST match these indexes to your actual file's column order
+                st.write(f"**Course Name:** {row[1]}")
+                st.write(f"**Course ID:** {row[2]}")
+                st.write(f"**Credit:** {row[3]}")
+                st.write(f"**Stream:** {row[4]}")
+                st.write(f"**Discipline:** {row[5]}")
+
+                st.markdown("#### 📅 Weekly Available Questions:")
+                for i in range(6, 21):  # Assuming week 1 is column 6 up to 20
+                    st.write(f"Week {i - 5}: {row[i]}")
+
+                st.write(f"**Project:** {row[22]}")
+                st.write(f"**Uploaded Name:** {row[26]}")
+                st.write(f"**Grand Total:** {row[24]}")
+
+            else:
+                st.warning("❌ No matching course found.")
+
+    except Exception as e:
+        st.error(f"❌ Error reading Excel file: {e}")
+else:
+    st.info("📁 Please upload your Excel file to begin.")
